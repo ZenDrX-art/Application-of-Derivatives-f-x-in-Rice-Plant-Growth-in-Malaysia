@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+  <meta charset="UTF-8">
+  <title>Penggunaan Derivatif f’(x) dalam Pertumbuhan Tanaman Padi di Malaysia</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      margin: 20px;
+      background: linear-gradient(to bottom, #f0fff0, #e6ffe6);
+      color: #333;
+    }
+    h2 {
+      color: #228B22;
+      text-align: center;
+      font-weight: bold;
+    }
+    p {
+      max-width: 800px;
+      margin: 10px auto;
+      line-height: 1.6;
+    }
+    canvas {
+      max-width: 800px;
+      margin: 30px auto;
+      display: block;
+      border: 2px solid #228B22;
+      border-radius: 10px;
+      background-color: #ffffff;
+      box-shadow: 0 4px 10px rgba(34,139,34,0.3);
+    }
+    #info {
+      margin-top: 20px;
+      font-size: 16px;
+      text-align: center;
+      color: #228B22;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <h2>Penggunaan Derivatif f’(x) dalam Pertumbuhan Tanaman Padi di Malaysia</h2>
+  <p><b>Masalah Biosains:</b> Petani perlu tahu kadar pertumbuhan pokok padi untuk menentukan masa sesuai bagi pembajaan dan pengairan.</p>
+  <p><b>Fungsi:</b> f(x) = tinggi pokok padi (cm) mengikut masa (hari)</p>
+  <p><b>Derivatif:</b> f’(x) = kadar pertumbuhan pokok padi (cm/hari)</p>
+
+  <canvas id="growthChart"></canvas>
+  <div id="info">Klik pada graf untuk lihat kadar pertumbuhan pada hari tertentu.</div>
+
+  <script>
+    const days = [0,10,20,30,40,50,60];
+    const heights = [5,15,28,45,60,70,75];
+
+    function derivativeAt(index) {
+      if (index === 0) return (heights[1]-heights[0])/(days[1]-days[0]);
+      if (index === heights.length-1) return (heights[index]-heights[index-1])/(days[index]-days[index-1]);
+      return (heights[index+1]-heights[index-1])/(days[index+1]-days[index-1]);
+    }
+
+    const ctx = document.getElementById('growthChart').getContext('2d');
+    const chart = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: days,
+        datasets: [{
+          label: 'Tinggi Pokok Padi (cm)',
+          data: heights,
+          borderColor: '#228B22',
+          backgroundColor: 'rgba(34,139,34,0.2)',
+          pointBackgroundColor: '#228B22',
+          pointBorderColor: '#fff',
+          pointHoverRadius: 8,
+          fill: true,
+          tension: 0.4
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          tooltip: { enabled: true }
+        },
+        onClick: (evt) => {
+          const points = chart.getElementsAtEventForMode(evt, 'nearest', { intersect: true }, true);
+          if (points.length) {
+            const i = points[0].index;
+            const rate = derivativeAt(i).toFixed(2);
+            const day = days[i];
+            let explanation = "";
+            if (rate > 2) explanation = "Pokok sedang membesar dengan cepat.";
+            else if (rate > 0.5) explanation = "Pertumbuhan sederhana, sesuai untuk pembajaan.";
+            else explanation = "Pertumbuhan perlahan, hampir matang.";
+            document.getElementById('info').innerHTML =
+              `Hari ke-${day}: Kadar pertumbuhan = ${rate} cm/hari. <br><b>${explanation}</b>`;
+          }
+        }
+      }
+    });
+  </script>
+</body>
+</html>
